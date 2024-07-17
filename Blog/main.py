@@ -3,6 +3,7 @@ from typing import Optional
 import uvicorn
 import models
 import schemas
+from typing import List
 
 from sqlalchemy.orm import Session
 
@@ -13,7 +14,7 @@ models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
-'''
+'''1
 => To run the fast api app
 
 uvicorn main:app --reload
@@ -97,10 +98,11 @@ def create_blog(request: schemas.Blog,  db:Session=Depends(get_db)):
 
 
 # Fetching all the blogs
-@app.get("/blog/", status_code=200)
+@app.get("/blog/", response_model=List[schemas.ShowBlog], status_code=200)
 def fetch_all_blogs(db:Session=Depends(get_db)):
     blogs = db.query(models.Blog).all()
-    return {"message": "Blogs Retrieve Success !", "data":blogs}
+    return blogs
+    # return {"message": "Blogs Retrieve Success !", "data":blogs}
        
        
 # Fetching the particular blog
