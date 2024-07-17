@@ -27,7 +27,7 @@ print(sys.prefix)
 
 '''
 
-#Dependency
+# Dependency
 def get_db():
     db = SessionLocal()
     try : 
@@ -36,6 +36,7 @@ def get_db():
         db.close()
         
 
+# Test the FAST API 
 @app.get("/test/")
 async def test():
     return {"message": "I am ON !"}
@@ -44,6 +45,9 @@ async def test():
 @app.get("/greet/{name}/")
 async def greet(name):
     return {"message": f"Welcome {name} !"}
+
+
+
 
 
 # @app.get("/blog/")
@@ -73,6 +77,10 @@ def fetch_items(skip: int = 0, limit: int = 10):
     return {"message": {"skip": skip, "limit": limit}}
   
 
+
+
+
+
 # Creating a new blog
 @app.post('/blog', status_code=201)
 def create_blog(request: schemas.Blog,  db:Session=Depends(get_db)):
@@ -90,7 +98,7 @@ def create_blog(request: schemas.Blog,  db:Session=Depends(get_db)):
 
 # Fetching all the blogs
 @app.get("/blog/", status_code=200)
-def fetch_blogs(db:Session=Depends(get_db)):
+def fetch_all_blogs(db:Session=Depends(get_db)):
     blogs = db.query(models.Blog).all()
     return {"message": "Blogs Retrieve Success !", "data":blogs}
        
@@ -100,21 +108,43 @@ def fetch_blogs(db:Session=Depends(get_db)):
 def show_blog(id : int, response: Response, db:Session=Depends(get_db)):
     data = db.query(models.Blog).filter(models.Blog.id==id).first()
     if data:
-        return {"message": "Data retrieved Success", "data": data}
+        return {"message": "Blog retrieved Success", "data": data}
     else:
         response.status_code = 404
-        return {"message": "Data not found", "data": []}
+        return {"message": f"Blog with id {id} not found"}
+
+
+# Update the particular blog
+@app.put("/blog/{id}/", status_code=201)
+def update(id : int, request: schemas.UpdateBlog, response: Response, db:Session=Depends(get_db)):
+    blog = db.query(models.Blog).filter(models.Blog.id == id).first()
+    if blog:
+
+        if request.body:
+            blog.body = request.body
+        if request.title:
+            blog.title = request.title
+
+        db.commit()
+        db.refresh(blog)  # Refresh the instance to reflect the updated data
+        return {"message": "Blog update Success", "data": blog}
+    else:
+        response.status_code = 404
+        return {"message": f"Blog with id {id} not found"}
+    
 
 # Destroy the particular blog
-@app.get("/blog/{id}/", status_code=200)
+@app.delete("/blog/{id}/", status_code=200)
 def destroy(id : int, response: Response, db:Session=Depends(get_db)):
-    data = db.query(models.Blog).filter(models.Blog.id==id).first()
-    if data:
-        data.delete()
-        return {"message": "Data destroy Success"}
+    blog = db.query(models.Blog).filter(models.Blog.id == id).first()
+    if blog:
+        db.delete(blog)
+        db.commit()
+        return {"message": "Blog destroy Success"}
     else:
         response.status_code = 404
-        return {"message": "Data not found"}
+        return {"message": f"Blog with id {id} not found"}
+    
 
 # if __name__ == "__main__":
 #     uvicorn.run(app, host="localhost", port=9000)

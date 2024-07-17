@@ -7,3 +7,8 @@ class Blog(BaseModel):
     body: str
     published : bool | None = False
     
+
+class UpdateBlog(BaseModel):
+    title: str | None = ""
+    body: str | None = ""
+    published : bool | None = False
