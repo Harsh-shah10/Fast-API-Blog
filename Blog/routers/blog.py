@@ -9,10 +9,13 @@ from database import get_db
 import schemas 
 import models 
 
-router = APIRouter()
+router = APIRouter(
+    prefix='/blog',
+    tags=['Blogs']
+)
 
 # Creating a new blog
-@router.post('/blog', status_code=201, tags=['blogs'])
+@router.post('/', status_code=201)
 def create_blog(request: schemas.Blog,  db:Session=Depends(get_db)):
     blog_exist = db.query(models.Blog).filter(models.Blog.title==request.title.strip()).first()
     if blog_exist:
@@ -31,7 +34,7 @@ def create_blog(request: schemas.Blog,  db:Session=Depends(get_db)):
 
 
 # Fetching all the blogs
-@router.get("/blog/", response_model=List[schemas.ShowBlog], status_code=200, tags=['blogs'])
+@router.get("/", response_model=List[schemas.ShowBlog], status_code=200)
 def fetch_all_blogs(db:Session=Depends(get_db)):
     blogs = db.query(models.Blog).all()
     return blogs
@@ -39,7 +42,7 @@ def fetch_all_blogs(db:Session=Depends(get_db)):
        
        
 # Fetching the particular blog
-@router.get("/blog/{id}/", status_code=200, response_model=schemas.ShowBlog, tags=['blogs'])
+@router.get("/{id}/", status_code=200, response_model=schemas.ShowBlog)
 def show_blog(id: int, db: Session = Depends(get_db)):
     data = db.query(models.Blog).filter(models.Blog.id == id).first()
     if data:
@@ -49,7 +52,7 @@ def show_blog(id: int, db: Session = Depends(get_db)):
 
 
 # Update the particular blog
-@router.put("/blog/{id}/", status_code=201, tags=['blogs'])
+@router.put("/{id}/", status_code=201)
 def update(id : int, request: schemas.UpdateBlog, response: Response, db:Session=Depends(get_db)):
     blog = db.query(models.Blog).filter(models.Blog.id == id).first()
     if blog:
@@ -68,7 +71,7 @@ def update(id : int, request: schemas.UpdateBlog, response: Response, db:Session
     
 
 # Destroy the particular blog
-@router.delete("/blog/{id}/", status_code=200, tags=['blogs'])
+@router.delete("/{id}/", status_code=200)
 def destroy(id : int, response: Response, db:Session=Depends(get_db)):
     blog = db.query(models.Blog).filter(models.Blog.id == id).first()
     if blog:
