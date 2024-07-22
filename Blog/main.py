@@ -38,12 +38,12 @@ def get_db():
         
 
 # Test the FAST API 
-@app.get("/test/")
+@app.get("/test/", tags=['test'])
 async def test():
     return {"message": "I am ON !"}
 
 
-@app.get("/greet/{name}/")
+@app.get("/greet/{name}/", tags=['test'])
 async def greet(name):
     return {"message": f"Welcome {name} !"}
 
@@ -59,23 +59,22 @@ async def greet(name):
 #     else:
 #         return {'message': f'fetched {limit} -> blogs from DB'}
        
-  
-       
-@app.get("/blog/{id}/comments/")
-def comments(id : int, limit : int = 10):
-    # Fetching 10 comments by default
-    return {'message': {'1', '2'}, 'limit':limit, 'id':id}
+
+# @app.get("/blog/{id}/comments/")
+# def comments(id : int, limit : int = 10):
+#     # Fetching 10 comments by default
+#     return {'message': {'1', '2'}, 'limit':limit, 'id':id}
  
  
-@app.get("/blog/unpublish/")
-def unpublish_blog():
-    return {"message": "all blogs unpublished successfully !"}
+# @app.get("/blog/unpublish/")
+# def unpublish_blog():
+#     return {"message": "all blogs unpublished successfully !"}
 
 
-# Query Params | items/?skip=111&limit=222
-@app.get("/items/")
-def fetch_items(skip: int = 0, limit: int = 10):
-    return {"message": {"skip": skip, "limit": limit}}
+# # Query Params | items/?skip=111&limit=222
+# @app.get("/items/")
+# def fetch_items(skip: int = 0, limit: int = 10):
+#     return {"message": {"skip": skip, "limit": limit}}
   
 
 
@@ -83,7 +82,7 @@ def fetch_items(skip: int = 0, limit: int = 10):
 
 
 # Creating a new blog
-@app.post('/blog', status_code=201)
+@app.post('/blog', status_code=201, tags=['blog'])
 def create_blog(request: schemas.Blog,  db:Session=Depends(get_db)):
     blog_exist = db.query(models.Blog).filter(models.Blog.title==request.title.strip()).first()
     if blog_exist:
@@ -98,7 +97,7 @@ def create_blog(request: schemas.Blog,  db:Session=Depends(get_db)):
 
 
 # Fetching all the blogs
-@app.get("/blog/", response_model=List[schemas.ShowBlog], status_code=200)
+@app.get("/blog/", response_model=List[schemas.ShowBlog], status_code=200, tags=['blog'])
 def fetch_all_blogs(db:Session=Depends(get_db)):
     blogs = db.query(models.Blog).all()
     return blogs
@@ -106,7 +105,7 @@ def fetch_all_blogs(db:Session=Depends(get_db)):
        
        
 # Fetching the particular blog
-@app.get("/blog/{id}/", status_code=200)
+@app.get("/blog/{id}/", status_code=200, tags=['blog'])
 def show_blog(id : int, response: Response, db:Session=Depends(get_db)):
     data = db.query(models.Blog).filter(models.Blog.id==id).first()
     if data:
@@ -117,7 +116,7 @@ def show_blog(id : int, response: Response, db:Session=Depends(get_db)):
 
 
 # Update the particular blog
-@app.put("/blog/{id}/", status_code=201)
+@app.put("/blog/{id}/", status_code=201, tags=['blog'])
 def update(id : int, request: schemas.UpdateBlog, response: Response, db:Session=Depends(get_db)):
     blog = db.query(models.Blog).filter(models.Blog.id == id).first()
     if blog:
@@ -136,7 +135,7 @@ def update(id : int, request: schemas.UpdateBlog, response: Response, db:Session
     
 
 # Destroy the particular blog
-@app.delete("/blog/{id}/", status_code=200)
+@app.delete("/blog/{id}/", status_code=200, tags=['blog'])
 def destroy(id : int, response: Response, db:Session=Depends(get_db)):
     blog = db.query(models.Blog).filter(models.Blog.id == id).first()
     if blog:
@@ -149,7 +148,7 @@ def destroy(id : int, response: Response, db:Session=Depends(get_db)):
     
 
 # Creating a new user
-@app.post('/user')
+@app.post('/user', tags=['user'])
 def create_user(request: schemas.User,  db:Session=Depends(get_db)):
     user_exist = db.query(models.User).filter(models.User.email==request.email.strip()).first()
     if user_exist:
@@ -167,7 +166,7 @@ def create_user(request: schemas.User,  db:Session=Depends(get_db)):
 
 
 # Fetching the particular user
-@app.get("/user/{id}/", status_code=200, response_model=schemas.ShowUser)
+@app.get("/user/{id}/", status_code=200, response_model=schemas.ShowUser, tags=['user'])
 def show_user(id : int, response: Response, db:Session=Depends(get_db)):
     data = db.query(models.User).filter(models.User.id==id).first()
     if data:
