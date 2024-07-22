@@ -179,18 +179,14 @@ def show_user(id : int, response: Response, db:Session=Depends(get_db)):
 
 
 # Fetching all the blogs for that particluar user
-@app.get("/user/blogs/{id}/", status_code=200, response_model=schemas.ShowBlogs, tags=['user'])
+@app.get("/user/blogs/{id}/", status_code=200, response_model=schemas.ShowUserBlogs, tags=['user'])
 def fetch_created_blogs(id : int, response: Response, db:Session=Depends(get_db)):
-    user_exist = db.query(models.User).filter(models.User.id==id).first()
-    if user_exist:
-        # Fetch all the blogs for the user
-        blogs = db.query(models.Blog).filter(models.Blog.user_id == id).all()
-        return {
-            "blogs": blogs  
-        }    
+    data = db.query(models.User).filter(models.User.id==id).first()
+    if data:
+        return data
     else:
         raise HTTPException(status_code=404, detail=f"User not found with id - {id}")
-
+    
 
 # if __name__ == "__main__":
 #     uvicorn.run(app, host="localhost", port=9000)

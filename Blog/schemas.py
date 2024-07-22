@@ -35,8 +35,10 @@ class ShowBlog(BaseModel):
         orm_mode = True
 
 
-class ShowBlogs(BaseModel):
-    blogs: List[UpdateBlog]
+class ShowUserBlogs(BaseModel):
+    name : str
+    email : str
+    blogs: List[UpdateBlog] = []
 
     class Config:
         orm_mode = True
