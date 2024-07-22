@@ -88,7 +88,11 @@ def create_blog(request: schemas.Blog,  db:Session=Depends(get_db)):
     if blog_exist:
         raise HTTPException(status_code=400, detail="Blog already exists !!")
 
-    new_blog = models.Blog(title=request.title, body=request.body)
+    user_exist = db.query(models.User).filter(models.User.id == request.user_id).first()
+    if not user_exist:
+        return {'message': f'User does not exists with ID - {request.user_id}'}
+
+    new_blog = models.Blog(title=request.title, body=request.body, user_id=request.user_id)
     db.add(new_blog)
     db.commit()
     
@@ -105,14 +109,13 @@ def fetch_all_blogs(db:Session=Depends(get_db)):
        
        
 # Fetching the particular blog
-@app.get("/blog/{id}/", status_code=200, tags=['blog'])
-def show_blog(id : int, response: Response, db:Session=Depends(get_db)):
-    data = db.query(models.Blog).filter(models.Blog.id==id).first()
+@app.get("/blog/{id}/", status_code=200, response_model=schemas.ShowBlog, tags=['blog'])
+def show_blog(id: int, db: Session = Depends(get_db)):
+    data = db.query(models.Blog).filter(models.Blog.id == id).first()
     if data:
-        return {"message": "Blog retrieved Success", "data": data}
+        return data
     else:
-        response.status_code = 404
-        return {"message": f"Blog with id {id} not found"}
+        raise HTTPException(status_code=404, detail=f"Blog with id {id} not found")
 
 
 # Update the particular blog
