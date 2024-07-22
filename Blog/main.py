@@ -3,8 +3,8 @@ from typing import Optional
 import uvicorn
 import models
 import schemas
+from hashing import HashPassword
 from typing import List
-
 from sqlalchemy.orm import Session
 
 
@@ -147,6 +147,23 @@ def destroy(id : int, response: Response, db:Session=Depends(get_db)):
         response.status_code = 404
         return {"message": f"Blog with id {id} not found"}
     
+
+@app.post('/user')
+def create_user(request: schemas.User,  db:Session=Depends(get_db)):
+    user_exist = db.query(models.User).filter(models.User.email==request.email.strip()).first()
+    if user_exist:
+        raise HTTPException(status_code=400, detail="User already exists !!")
+
+    # hashed_password = pwd_context.hash(request.password)
+    hashed_password = HashPassword.brcypt(request.password)
+
+    new_user = models.User(name=request.name, email=request.email, password=hashed_password)
+    db.add(new_user)
+    db.commit()
+    
+    db.refresh(new_user)
+    return {'message': f'User created successfully with email : {request.email} !!'}
+
 
 # if __name__ == "__main__":
 #     uvicorn.run(app, host="localhost", port=9000)
