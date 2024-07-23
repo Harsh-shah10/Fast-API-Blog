@@ -42,3 +42,16 @@ class ShowUserBlogs(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class UserLogin(BaseModel):
+    username : str
+    password : str
+
+    class Config:
+        orm_mode = True
+
+
+class TokenData(BaseModel):
+    username: str | None = None
+    scopes: list[str] = []

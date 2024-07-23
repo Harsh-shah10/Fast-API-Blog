@@ -6,8 +6,7 @@ from typing import List
 from sqlalchemy.orm import Session
 
 from database import get_db
-import schemas 
-import models 
+import schemas, models
 
 router = APIRouter(
     prefix='/blog',

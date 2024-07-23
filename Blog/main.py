@@ -17,11 +17,12 @@ models.Base.metadata.create_all(bind=engine)
 # Importing routers
 from routers.blog import router as blog_router
 from routers.user import router as user_router
+from routers.authenticate import router as auth_router
 
 # Including routers 
+app.include_router(auth_router)
 app.include_router(blog_router)
 app.include_router(user_router)
-
 
 '''1
 => To run the fast api app
