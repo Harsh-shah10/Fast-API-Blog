@@ -4,9 +4,10 @@ import uvicorn
 from hashing import HashPassword
 from typing import List
 from sqlalchemy.orm import Session
+from typing import Annotated
 
 from database import get_db
-import schemas, models
+import schemas, models, oauth2
 
 router = APIRouter(
     prefix='/blog',
@@ -34,7 +35,8 @@ def create_blog(request: schemas.Blog,  db:Session=Depends(get_db)):
 
 # Fetching all the blogs
 @router.get("/", response_model=List[schemas.ShowBlog], status_code=200)
-def fetch_all_blogs(db:Session=Depends(get_db)):
+# def fetch_all_blogs(db:Session=Depends(get_db)):
+def fetch_all_blogs(current_user: Annotated[schemas.User, Depends(oauth2.get_current_user)], db: Session = Depends(get_db)):
     blogs = db.query(models.Blog).all()
     return blogs
     # return {"message": "Blogs Retrieve Success !", "data":blogs}

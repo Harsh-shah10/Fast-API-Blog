@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Depends, HTTPException, Response, status, APIRouter
+from fastapi.security import OAuth2PasswordRequestForm
 from hashing import HashPassword
 from sqlalchemy.orm import Session
 
@@ -12,7 +13,8 @@ router = APIRouter(
 )
 
 @router.post("/login")
-def login(request: schemas.UserLogin,  db:Session=Depends(get_db)):
+# def login(request: schemas.UserLogin,  db:Session=Depends(get_db)):
+def login(request: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     user_exist = db.query(models.User).filter(models.User.email==request.username.strip()).first()
     if not user_exist:
         raise HTTPException(status_code=404, detail="Invalid username Passed !!")
