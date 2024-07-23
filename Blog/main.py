@@ -39,7 +39,7 @@ print(sys.prefix)
 '''
 
 # Test the FAST API 
-@app.get("/greet/{name}/", tags=['demo'])
+@app.get("/greet/{name}/", tags=['Test'])
 async def greet(name):
     return {"message": f"Welcome {name} !"}
 

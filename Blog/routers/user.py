@@ -6,13 +6,13 @@ from typing import List
 from sqlalchemy.orm import Session
 
 from database import get_db
-import schemas, models
+import schemas, models, oauth2
 
 router = APIRouter()
 
 
 # Creating a new user
-@router.post('/user', tags=['users'])
+@router.post('/user', tags=['Users'])
 def create_user(request: schemas.User,  db:Session=Depends(get_db)):
     user_exist = db.query(models.User).filter(models.User.email==request.email.strip()).first()
     if user_exist:
@@ -30,7 +30,7 @@ def create_user(request: schemas.User,  db:Session=Depends(get_db)):
 
 
 # Fetching the particular user
-@router.get("/user/{id}/", status_code=200, response_model=schemas.ShowUser, tags=['users'])
+@router.get("/user/{id}/", status_code=200, response_model=schemas.ShowUser, tags=['Users'])
 def show_user(id : int, response: Response, db:Session=Depends(get_db)):
     data = db.query(models.User).filter(models.User.id==id).first()
     if data:
@@ -40,7 +40,7 @@ def show_user(id : int, response: Response, db:Session=Depends(get_db)):
 
 
 # Fetching all the blogs for that particluar user
-@router.get("/user/blogs/{id}/", status_code=200, response_model=schemas.ShowUserBlogs, tags=['users'])
+@router.get("/user/blogs/{id}/", status_code=200, response_model=schemas.ShowUserBlogs, tags=['Users'])
 def fetch_created_blogs(id : int, response: Response, db:Session=Depends(get_db)):
     data = db.query(models.User).filter(models.User.id==id).first()
     if data:
