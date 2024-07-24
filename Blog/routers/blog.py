@@ -16,7 +16,8 @@ router = APIRouter(
 
 # Creating a new blog
 @router.post('/', status_code=201)
-def create_blog(request: schemas.Blog,  db:Session=Depends(get_db)):
+# def create_blog(request: schemas.Blog,  db:Session=Depends(get_db)):
+def create_blog(request: schemas.Blog, current_user: Annotated[schemas.User, Depends(oauth2.get_current_user)],  db:Session=Depends(get_db)):
     blog_exist = db.query(models.Blog).filter(models.Blog.title==request.title.strip()).first()
     if blog_exist:
         raise HTTPException(status_code=400, detail="Blog already exists !!")
@@ -44,7 +45,8 @@ def fetch_all_blogs(current_user: Annotated[schemas.User, Depends(oauth2.get_cur
        
 # Fetching the particular blog
 @router.get("/{id}/", status_code=200, response_model=schemas.ShowBlog)
-def show_blog(id: int, db: Session = Depends(get_db)):
+# def show_blog(id: int, db: Session = Depends(get_db)):
+def show_blog(id: int, current_user: Annotated[schemas.User, Depends(oauth2.get_current_user)], db: Session = Depends(get_db)):
     data = db.query(models.Blog).filter(models.Blog.id == id).first()
     if data:
         return data
@@ -54,7 +56,8 @@ def show_blog(id: int, db: Session = Depends(get_db)):
 
 # Update the particular blog
 @router.put("/{id}/", status_code=201)
-def update(id : int, request: schemas.UpdateBlog, response: Response, db:Session=Depends(get_db)):
+# def update(id : int, request: schemas.UpdateBlog, response: Response, db:Session=Depends(get_db)):
+def update(id : int, request: schemas.UpdateBlog, response: Response, current_user: Annotated[schemas.User, Depends(oauth2.get_current_user)], db:Session=Depends(get_db)):
     blog = db.query(models.Blog).filter(models.Blog.id == id).first()
     if blog:
 
@@ -73,7 +76,8 @@ def update(id : int, request: schemas.UpdateBlog, response: Response, db:Session
 
 # Destroy the particular blog
 @router.delete("/{id}/", status_code=200)
-def destroy(id : int, response: Response, db:Session=Depends(get_db)):
+# def destroy(id : int, response: Response, db:Session=Depends(get_db)):
+def destroy(id : int, response: Response, current_user: Annotated[schemas.User, Depends(oauth2.get_current_user)], db:Session=Depends(get_db)):
     blog = db.query(models.Blog).filter(models.Blog.id == id).first()
     if blog:
         db.delete(blog)
