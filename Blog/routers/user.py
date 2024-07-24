@@ -2,7 +2,7 @@ from fastapi import FastAPI, Depends, HTTPException, Response, status, APIRouter
 from typing import Optional
 import uvicorn
 from hashing import HashPassword
-from typing import List
+from typing import List, Annotated
 from sqlalchemy.orm import Session
 
 from database import get_db
